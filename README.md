@@ -5,6 +5,7 @@ _A Minecraft (Java Edition / Forge) mod which lets admins add configurable plant
 
 ## Requirements
 
+- Required on both client and server
 - No dependency mods
 - Written with Java 8
 - Written for [Forge 1.12.2 - 14.23.5.2860](https://files.minecraftforge.net/net/minecraftforge/forge/index_1.12.2.html)
