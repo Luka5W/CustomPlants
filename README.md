@@ -34,7 +34,20 @@ NullPointerException :P
 - Mod support
   - [Immersive Engineering/ Garden Cloche](https://ftb.fandom.com/wiki/Garden_Cloche)
 
+
+## Use in Modpacks
+
+You can use this mod in modpacks under the following conditions:
+- If the modpack does not cost money or the like (donations are fine of course).
+- When you give credits to the contributors (e.g. a [link](/graphs/contributors) somewhere in the modpacks description or list of mods).
+- When the mod is not downloaded from the official repository directly to the players machine you have to inform the players on the modpack page about it.
+  A general mention (without naming this mod explicitly) is enough.<br />
+  _Downloading code or programs from official sources directly to the end user's computer makes it more difficult for manipulated code to spread, thus increasing security - you wouldn't want to download Microsoft Windows from a questionable .to website, would you?_
+
+
 ## Contributing
+
+First of all, any kind of contribution is welcome. However, there are two small guidelines:
 
 This mod is intended to add plants as freely configurable as possible. No more, no less.
 Features that other mods cover better, these mods should take care of.
