@@ -1,0 +1,17 @@
+[
+{
+  "modid": "customplants",
+  "name": "§2Custom Plants§r",
+  "description": "This mod lets you add customizable plants to Minecraft.",
+  "version": "${version}",
+  "mcversion": "${mcversion}",
+  "url": "https://github.com/Luka5W/CustomPlants",
+  "updateUrl": "https://luka5w.github.io/CustomPlants/versions.json",
+  "updateJSON": "https://luka5w.github.io/CustomPlants/versions.json",
+  "authorList": ["Luka5W"],
+  "credits": "You for using this Mod <3",
+  "logoFile": "assets/customplants/textures/logo.png",
+  "screenshots": [],
+  "dependencies": []
+}
+]
