@@ -1,0 +1,8 @@
+# UpdateChecker
+customplants.update.chat_prefix=§7[§2CustomPlants§7] %s
+customplants.update.failed=§cFailed to check for updates.
+customplants.update.outdated=§aA new §2stable§a version of Custom Plants is available. You can download the latest version here: %s.
+customplants.update.beta_outdated=§aA new §cunstable§a version of Custom Plants is available. You can download the latest version here: %s.
+
+# CreativeTab
+itemGroup.customplants=Custom Plants
