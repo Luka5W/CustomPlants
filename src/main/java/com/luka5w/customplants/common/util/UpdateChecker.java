@@ -1,5 +1,6 @@
 package com.luka5w.customplants.common.util;
 
+import com.luka5w.customplants.CustomPlants;
 import com.luka5w.customplants.common.data.MainConfig;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.text.ITextComponent;
@@ -19,7 +20,7 @@ import javax.annotation.Nullable;
 /**
  * Utility to check for updates.
  */
-@Mod.EventBusSubscriber
+@Mod.EventBusSubscriber(modid = CustomPlants.MOD_ID)
 public class UpdateChecker {
 
     private static ITextComponent updateAdvice;
