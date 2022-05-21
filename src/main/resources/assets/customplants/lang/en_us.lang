@@ -6,3 +6,7 @@ customplants.update.beta_outdated=§aA new §cunstable§a version of Custom Plan
 
 # CreativeTab
 itemGroup.customplants=Custom Plants
+
+# Custom Plant
+item.customplant.name=Custom Plant
+tile.customplant.name=Custom Plant

@@ -80,7 +80,9 @@ dependencies {
     // compile "some.group:artifact:version:classifier"
     // compile "some.group:artifact:version"
 
-    compile "com.fasterxml.jackson.core:jackson-databind:2.13.2.2"
+    // TODO 2022-05-21: remove when no longer required
+    //compile "com.fasterxml.jackson.core:jackson-databind:2.13.2.2'
+    //compile 'com.google.code.gson:gson:2.9.0'
 
 }
 

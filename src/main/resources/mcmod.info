@@ -9,8 +9,8 @@
   "updateUrl": "https://luka5w.github.io/CustomPlants/versions.json",
   "updateJSON": "https://luka5w.github.io/CustomPlants/versions.json",
   "authorList": ["Luka5W"],
-  "credits": "You for using this Mod <3",
-  "logoFile": "assets/customplants/textures/logo.png",
+  "credits": "<a href=\"https://github.com/Tmtravlr/\">Tmtravlr</a> for Additions (helped me a lot during development) and you for using this Mod <3",
+  "logoFile": "assets/customplants/textures/blocks/customplant.png",
   "screenshots": [],
   "dependencies": []
 }

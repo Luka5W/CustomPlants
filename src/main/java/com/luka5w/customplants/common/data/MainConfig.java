@@ -6,10 +6,10 @@ import net.minecraftforge.common.config.Config;
 @Config(modid = CustomPlants.MOD_ID)
 public class MainConfig {
 
-    @Config.Comment({"The directory where all plants and their resources are configured in (relative to the server.jar)."})
-    @Config.Name("dir_resources")
+    @Config.Comment({"The directory where all plant packs are stored in (relative to the server.jar)."})
+    @Config.Name("dir_plantpacks")
     @Config.RequiresMcRestart
-    public static String dirResources = "config/customplants";
+    public static String dirPlantPacks = "addons/customplants";
 
     @Config.Name("updates")
     public static Updates updates = new Updates();
@@ -24,5 +24,14 @@ public class MainConfig {
         @Config.RequiresMcRestart
         public boolean adviceUnstable = false;
     }
-
+    
+    @Config.Name("defaults")
+    public static Defaults defaults = new Defaults();
+    
+    private static class Defaults {
+        @Config.Comment({"Enable Creative Tab with all custom plants"})
+        @Config.Name("creative_tab")
+        @Config.RequiresMcRestart
+        public boolean creativeTab = true;
+    }
 }

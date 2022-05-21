@@ -1,33 +1,34 @@
 package com.luka5w.customplants.common;
 
 import com.luka5w.customplants.common.data.MainConfig;
-import com.luka5w.customplants.common.data.ResourceConfigHandler;
-import com.luka5w.customplants.common.init.PlantsRegistry;
+import com.luka5w.customplants.common.data.plantspacks.PlantsPackHandler;
+import com.luka5w.customplants.common.util.Registry;
 import com.luka5w.customplants.common.util.UpdateChecker;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import org.apache.logging.log4j.Logger;
 
-import javax.annotation.Nonnull;
+import java.io.File;
 
 public class CommonProxy {
     
     private static CommonProxy instance;
-    private Logger logger;
-    private MainConfig config;
-    protected ResourceConfigHandler resourceConfigHandler;
-    protected PlantsRegistry plantsRegistry;
+    
+    protected Logger logger;
+    protected MainConfig config;
+    protected PlantsPackHandler plantsPackHandler;
+    protected Registry registry;
     
     public void preInit(Logger logger, FMLPreInitializationEvent event) {
         instance = this;
         this.logger = logger;
         this.config = new MainConfig();
-    
         UpdateChecker.init(logger);
-        
-        this.resourceConfigHandler = new ResourceConfigHandler(logger);
-        this.plantsRegistry = new PlantsRegistry(this.logger, this.resourceConfigHandler);
+        this.registry = new Registry(this.logger);
+        // (Client-)PlantsPackHandler::new; See JavaDoc for more info
+        this.initPlantsPackHandler();
+        this.plantsPackHandler.loadPacks();
     }
     
     public void init(FMLInitializationEvent event) {
@@ -38,7 +39,11 @@ public class CommonProxy {
     
     }
     
-    public String getTranslation(@Nonnull String key) {
-        return this.resourceConfigHandler.getTranslation("en_us", null, key);
+    /**
+     * This method initializes the PlantsPackHandler.
+     * It will be overwritten in the ClientProxy to use the ClientPlantsPackHandler which loads the ResourcePack too.
+     */
+    protected void initPlantsPackHandler() {
+        this.plantsPackHandler = new PlantsPackHandler(this.logger, new File(".", MainConfig.dirPlantPacks), this.registry);
     }
 }
