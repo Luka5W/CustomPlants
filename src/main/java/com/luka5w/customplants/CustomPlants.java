@@ -10,7 +10,7 @@ import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import org.apache.logging.log4j.Logger;
 
-@Mod(modid = CustomPlants.MOD_ID, useMetadata = true)
+@Mod(modid = CustomPlants.MOD_ID, useMetadata = true, updateJSON = "https://raw.githubusercontent.com/Luka5W/CustomPlants/dev/versions.json")
 public class CustomPlants {
 
     public static final String MOD_ID = "customplants";

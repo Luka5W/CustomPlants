@@ -1,19 +1,23 @@
 package com.luka5w.customplants.common.tileentities;
 
-import com.luka5w.customplants.common.blocks.BlockCustomBush;
+import com.luka5w.customplants.common.blocks.BlockCustomPlant;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ITickable;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
-public class TileEntityCustomBush extends TileEntity implements ITickable {
+public class TileEntityCustomPlant extends TileEntity implements ITickable {
+    
+    public TileEntityCustomPlant() {
+    
+    }
     
     @Override
     public void update() {
         if (this.world != null && !this.world.isRemote && this.world.getTotalWorldTime() % 80L == 0L) {
             IBlockState state = this.world.getBlockState(this.pos);
-            ((BlockCustomBush) state.getBlock()).addEffects(this.world, this.pos, state);
+            ((BlockCustomPlant) state.getBlock()).addEffects(this.world, this.pos, state);
         }
     }
     

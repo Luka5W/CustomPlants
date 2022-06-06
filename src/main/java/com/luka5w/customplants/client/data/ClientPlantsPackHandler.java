@@ -18,8 +18,8 @@ public class ClientPlantsPackHandler extends PlantsPackHandler {
     
     private List<IResourcePack> defaultResourcePacks;
     
-    public ClientPlantsPackHandler(Logger logger, File packsDir, Registry registry) {
-        super(logger, packsDir, registry);
+    public ClientPlantsPackHandler(Logger logger, File packsDir, Registry registry, int maxDrops) {
+        super(logger, packsDir, registry, maxDrops);
         this.defaultResourcePacks = null;
     }
     

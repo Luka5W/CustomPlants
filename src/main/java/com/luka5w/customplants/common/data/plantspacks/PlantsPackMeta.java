@@ -1,7 +1,7 @@
 package com.luka5w.customplants.common.data.plantspacks;
 
 import com.google.gson.*;
-import com.luka5w.customplants.common.util.JsonUtils;
+import com.luka5w.customplants.common.util.serialization.old.JsonUtils;
 
 import java.lang.reflect.Type;
 import java.util.List;

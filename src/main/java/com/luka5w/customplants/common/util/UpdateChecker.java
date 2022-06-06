@@ -59,6 +59,18 @@ public class UpdateChecker {
      * @return The result from {@link ForgeVersion#getResult(ModContainer)}
      */
     public static ForgeVersion.CheckResult checkVersion() {
+        // TODO: 21.05.22 TL;DR: ForgeVersion#getResult only works when updateJSON is specified in the @Mod annotation
+        //  of the mod's main class. When updateJSON or updateUrl is specified in the mcmod.info, it will be ignored.
+        //  DETAILS:
+        //  Does not work because ForgeVersion#getResult is a getter for ForgeVersion#results (Map) which gets its items
+        //  from ForgeVersion#startVersionCheck. This method iterates over every mod returned by ForgeVersion#gatherMods,
+        //  gets the specified update url and requests the JSON file. ForgeVersion#gatherMods iterates over every loaded
+        //  mod and checks if an update url (FMLModContainer#updateJSONUrl) is specified. If so, it adds the mod to the
+        //  list to be returned. When parsing a mod in FMLModContainer#bindMetadata, only updateJSON specified by @Mod
+        //  will be added.
+        //  PROBLEM:
+        //  This mod specifies an update url in its mcmod.info. But when Forge is constructing the mod, it only takes
+        //  information from the @Mod annotation.
         return ForgeVersion.getResult(Loader.instance().activeModContainer());
     }
 

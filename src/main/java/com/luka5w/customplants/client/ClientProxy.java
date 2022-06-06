@@ -19,6 +19,6 @@ public class ClientProxy extends CommonProxy {
     
     @Override
     protected void initPlantsPackHandler() {
-        this.plantsPackHandler = new ClientPlantsPackHandler(this.logger, new File(Minecraft.getMinecraft().mcDataDir, MainConfig.dirPlantPacks), this.registry);
+        this.plantsPackHandler = new ClientPlantsPackHandler(this.logger, new File(Minecraft.getMinecraft().mcDataDir, MainConfig.dirPlantsPacks), this.registry, MainConfig.Performance.maxDrops);
     }
 }

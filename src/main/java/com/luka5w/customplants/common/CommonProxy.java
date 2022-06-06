@@ -24,7 +24,6 @@ public class CommonProxy {
         instance = this;
         this.logger = logger;
         this.config = new MainConfig();
-        UpdateChecker.init(logger);
         this.registry = new Registry(this.logger);
         // (Client-)PlantsPackHandler::new; See JavaDoc for more info
         this.initPlantsPackHandler();
@@ -36,7 +35,7 @@ public class CommonProxy {
     }
     
     public void postInit(FMLPostInitializationEvent event) {
-    
+        UpdateChecker.init(logger);
     }
     
     /**
@@ -44,6 +43,6 @@ public class CommonProxy {
      * It will be overwritten in the ClientProxy to use the ClientPlantsPackHandler which loads the ResourcePack too.
      */
     protected void initPlantsPackHandler() {
-        this.plantsPackHandler = new PlantsPackHandler(this.logger, new File(".", MainConfig.dirPlantPacks), this.registry);
+        this.plantsPackHandler = new PlantsPackHandler(this.logger, new File(".", MainConfig.dirPlantsPacks), this.registry, MainConfig.Performance.maxDrops);
     }
 }

@@ -1,4 +1,4 @@
-package com.luka5w.customplants.common.util;
+package com.luka5w.customplants.common.util.serialization.old;
 
 import com.google.gson.*;
 
