@@ -19,10 +19,7 @@ _v0_
     "bounding_boxes": "<array<object/AABB>>",
     "burn_time": "<int[0~]",
     "color": "<int/enum[0~63]>",
-    "drops": {
-      "name": "<string/ResourceLocation>",
-      "amount": "<int[0~64]>"
-    },
+    "drops": "<array<object/Drop>>",
     "facings": "<array<int/enum[0~5]>>",
     "ore_dict": "<string>",
     "type": "<int/enum[-1~6]>",
@@ -115,6 +112,32 @@ A resource location is similar to the stuff you enter in commands (except the me
 "<item_id>:<nbt>"           // partly defined, use defaults: customplants:<item_id>:<nbt>
 "<mod_id>:<item_id>"        // partly defined, use defaults: <mod_id>:<item_id>:0
 "<mod_id>:<item_id>:<nbt>"  // fully defined
+```
+
+
+#### `<object/Drop>`
+```json5
+{
+  "rounds": "<int[0~5]>",  // Default 0
+  "count": "<int[0~]",     // Default 1
+  "item": "<string/ResourceLocation>"
+}
+```
+- `rounds`: The maximum attempts to drop the item. Use 0 for 100% drop.
+- `count`: The amount of items to be dropped.
+- `item`: The item to be dropped.
+
+The method to determine whether an item should be dropped:
+```java
+// TODO: 06.06.22 find a better implementation for random drops
+protected boolean doDrop(Random rand, int fortune, float rounds) {
+        if (rounds == 0) return true;
+        int success = (fortune + 2) / 2;
+        for (int i = 0; i < rounds; i++) {
+            if (rand.nextInt(fortune + 2) / 2 > success) return true;
+        }
+        return false;
+    }
 ```
 
 
