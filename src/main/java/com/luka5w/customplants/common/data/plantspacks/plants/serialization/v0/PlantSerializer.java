@@ -4,9 +4,10 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import com.luka5w.customplants.common.data.plantspacks.plants.Plant;
+import com.luka5w.customplants.common.util.block.material.MaterialLogic;
 import com.luka5w.customplants.common.util.serialization.JsonUtil;
 import com.luka5w.customplants.common.util.serialization.v0.IJsonSerializer;
-import com.luka5w.customplants.common.util.block.material.MaterialLogic;
+import net.minecraft.block.Block;
 import net.minecraft.block.material.MapColor;
 import net.minecraft.block.material.Material;
 import net.minecraft.item.Item;
@@ -88,7 +89,7 @@ public class PlantSerializer implements IJsonSerializer<Plant> {
             facings = JsonUtil.getAsArrayOfT(JsonUtil.getChild(plantJson, "facings"), JsonUtil.getPath(path, "facings"),
                                              (facingJson, facingsPath, i) -> EnumFacing.values()[JsonUtil.getAsNumber(
                                                      facingJson, JsonUtil.getPath(facingsPath, i), 0, 5, 1)],
-                                             "array<int[0~5]");
+                                             "array<int[0~5]>");
             
         }
         else {
@@ -107,9 +108,15 @@ public class PlantSerializer implements IJsonSerializer<Plant> {
                                            (soilsJson, _1, _2) -> soilsJson.getAsString(), "array<string>");
             soilsAllowed = JsonUtil.getChildAsT(plantJson, path, "soils_allowed", JsonElement::getAsBoolean, "boolean");
         }
-        //noinspection ToArrayCallWithZeroLengthArrayArgument
-        return new Plant(aabbs == null ? new AxisAlignedBB[0] : aabbs.toArray(new AxisAlignedBB[aabbs.size()]),
-                         burnTime, drops, facings, material, oreDict, type, soils, soilsAllowed);
+        AxisAlignedBB[] aabbArray;
+        if (aabbs == null || aabbs.isEmpty()) {
+            aabbArray = new AxisAlignedBB[]{Block.NULL_AABB};
+        }
+        else  {
+            //noinspection ToArrayCallWithZeroLengthArrayArgument
+            aabbArray = aabbs.toArray(new AxisAlignedBB[aabbs.size()]);
+        }
+        return new Plant(aabbArray, burnTime, drops, facings, material, oreDict, type, soils, soilsAllowed);
     }
     
     public static class AABBSerializer {

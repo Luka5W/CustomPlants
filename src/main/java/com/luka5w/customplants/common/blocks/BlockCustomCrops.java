@@ -153,6 +153,11 @@ public class BlockCustomCrops extends BlockCustomPlant implements IGrowable {
     // PROPERTIES
     
     @Override
+    protected AxisAlignedBB getAABB(IBlockState state) {
+        return this.aabbs[this.getAge(state)];
+    }
+    
+    @Override
     protected IBlockState setActivated(boolean activatedOut, IBlockState stateIn) {
         return getDefaultState().withProperty(ACTIVATED, activatedOut)
                                 .withProperty(AGE, this.getAge(stateIn));

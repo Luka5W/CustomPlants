@@ -3,7 +3,6 @@ package com.luka5w.customplants.common.blocks;
 import com.luka5w.customplants.common.plantsbehavior.PlantBehavior;
 import com.luka5w.customplants.common.tileentities.TileEntityCustomPlant;
 import com.luka5w.customplants.common.util.TargetSelectors;
-import com.luka5w.customplants.common.util.debug_please_remove.DebugUtils;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.properties.PropertyBool;
@@ -38,7 +37,6 @@ import java.util.Random;
 public class BlockCustomPlant extends Block implements IPlantable {
     
     public static final PropertyBool ACTIVATED = PropertyBool.create("activated");
-    protected static TileEntityCustomPlant tileEntity = null;
     
     protected final AxisAlignedBB[] aabbs;
     protected final BlockFaceShape blockShape;
@@ -109,8 +107,7 @@ public class BlockCustomPlant extends Block implements IPlantable {
     
     @Override
     public AxisAlignedBB getBoundingBox(IBlockState state, IBlockAccess source, BlockPos pos) {
-        DebugUtils.releaseMouse(null, true);
-        return this.aabbs[this.getAge(state)];
+        return this.getAABB(state);
     }
     
     @Nullable
@@ -231,9 +228,7 @@ public class BlockCustomPlant extends Block implements IPlantable {
     @Nullable
     @Override
     public TileEntity createTileEntity(World world, IBlockState state) {
-        if (!this.hasTileEntity(state)) return null;
-        if (BlockCustomPlant.tileEntity == null) BlockCustomPlant.tileEntity = new TileEntityCustomPlant();
-        return BlockCustomPlant.tileEntity;
+        return this.hasTileEntity(state) ? new TileEntityCustomPlant() : null;
     }
     
     @Override
@@ -294,6 +289,10 @@ public class BlockCustomPlant extends Block implements IPlantable {
     }
     
     // PROPERTIES
+    
+    protected AxisAlignedBB getAABB(IBlockState state) {
+        return this.aabbs[0];
+    }
     
     protected IBlockState setActivated(boolean activatedOut, IBlockState stateIn) {
         return getDefaultState().withProperty(ACTIVATED, activatedOut);

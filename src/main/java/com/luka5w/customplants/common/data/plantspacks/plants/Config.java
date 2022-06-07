@@ -11,6 +11,8 @@ import net.minecraft.block.state.BlockFaceShape;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
 
+import javax.annotation.ParametersAreNonnullByDefault;
+
 /**
  * A holder for the parsed #plant section of plant config files.
  * @see com.luka5w.customplants.common.data.plantspacks.plants.serialization.Serializer
@@ -42,7 +44,7 @@ public class Config {
         switch (this.type.getType()) {
             case Bush:
                 block = new BlockCustomBush(
-                        this.plant.getAABBs()[0],
+                        this.plant.getAABBs(),
                         this.behavior,
                         this.plant.getMaterial(),
                         BlockFaceShape.CENTER,

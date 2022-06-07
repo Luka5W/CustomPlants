@@ -22,12 +22,12 @@ import java.util.List;
 public class BlockCustomBush extends BlockCustomPlant {
     
     public static final PropertyBool ACTIVATED = PropertyBool.create("activated");
-    public static final PropertyEnum<EnumFacing> FACING = PropertyEnum.<EnumFacing>create("facing", EnumFacing.class);
+    public static final PropertyEnum<EnumFacing> FACING = PropertyEnum.create("facing", EnumFacing.class);
     
-    public BlockCustomBush(AxisAlignedBB aabb, PlantBehavior behavior, Material blockMaterial, BlockFaceShape blockShape,
+    public BlockCustomBush(AxisAlignedBB[] aabbs, PlantBehavior behavior, Material blockMaterial, BlockFaceShape blockShape,
                            @Nullable List<Tuple<Float, ItemStack>> drops, List<EnumFacing> facings, String oreDict, EnumPlantType type,
                            @Nullable ArrayList<String> soilsList, boolean soilsAllowed) {
-        super(blockMaterial, new AxisAlignedBB[]{aabb}, blockShape, behavior, drops, facings, soilsList, soilsAllowed, type);
+        super(blockMaterial, aabbs, blockShape, behavior, drops, facings, soilsList, soilsAllowed, type);
     }
     
     // PLACEMENT
@@ -61,6 +61,11 @@ public class BlockCustomBush extends BlockCustomPlant {
     // TICKS/ EVENTS
     
     // PROPERTIES
+    
+    @Override
+    protected AxisAlignedBB getAABB(IBlockState state) {
+        return this.aabbs[this.getFacing(state).ordinal()];
+    }
     
     @Override
     protected IBlockState setActivated(boolean activatedOut, IBlockState stateIn) {
