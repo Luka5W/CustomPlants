@@ -76,11 +76,14 @@ _v0_
 {
   // ...
   "type": {
-    "can_use_bonemeal": "<boolean>" // Crops, Overlays, Extendables, Saplings
+    "can_use_bonemeal": "<boolean>" // Crops, Saplings
+    "ore_dict": "<string>"          // Crops
+    "min_light_lvl": "<int[0~15]"   // Crops, Saplings
   }
 }
 ```
-}
+- `type.can_use_bonemeal`: Whether a shift-right-click with bonemeal will grow the plant.
+- `type.ore_dict`: The ore dictionary name of the plant.
 
 
 ## Datatypes

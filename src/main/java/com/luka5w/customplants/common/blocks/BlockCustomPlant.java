@@ -14,8 +14,8 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
+import net.minecraft.init.SoundEvents;
 import net.minecraft.item.ItemStack;
 import net.minecraft.potion.PotionEffect;
 import net.minecraft.tileentity.TileEntity;
@@ -79,17 +79,15 @@ public class BlockCustomPlant extends Block implements IPlantable {
                this.canBlockStay(worldIn, pos, this.getDefaultState()) &&
                (this.soilsList != null || super.canPlaceBlockAt(worldIn, pos));
     }
-    
-    protected void checkAndDropBlock(World worldIn, BlockPos pos, IBlockState state) {
-        if (!this.canBlockStay(worldIn, pos, state))
-        {
-            this.dropBlockAsItem(worldIn, pos, state, 0);
-            worldIn.setBlockState(pos, Blocks.AIR.getDefaultState(), 3);
-        }
+    protected boolean checkAndDropBlock(World worldIn, BlockPos pos, IBlockState state) {
+        if (this.canBlockStay(worldIn, pos, state)) return true;
+        this.dropBlockAsItem(worldIn, pos, state, 0);
+        worldIn.setBlockToAir(pos);
+        return false;
     }
     
     protected boolean canBlockStay(World worldIn, BlockPos pos, IBlockState state) {
-        BlockPos soilPos = pos.offset(this.getFacing(state).getOpposite());
+        BlockPos soilPos = this.getBlockPosToSoil(state, pos);
         IBlockState soil = worldIn.getBlockState(soilPos);
         if (this.soilsList == null) {
             return soil.getBlock().canSustainPlant(soil, worldIn, soilPos, this.getFacing(state), this);
@@ -210,19 +208,11 @@ public class BlockCustomPlant extends Block implements IPlantable {
         return super.getSilkTouchDrop(state);
     }
     
-    
-    
-    @Override
-    protected NonNullList<ItemStack> captureDrops(boolean start) {
-        return super.captureDrops(start);
-    }
-    
     // TICKS/ UPDATES, TE
     
     @Override
     public boolean hasTileEntity(IBlockState state) {
-        boolean b = this.behavior.hasFeatureEffects();
-        return b;
+        return this.behavior.hasFeatureEffects();
     }
     
     @Nullable
@@ -238,7 +228,7 @@ public class BlockCustomPlant extends Block implements IPlantable {
     
     @Override
     public void updateTick(World worldIn, BlockPos pos, IBlockState state, Random rand) {
-        this.checkAndDropBlock(worldIn, pos, state);
+        if (!worldIn.isRemote) this.checkAndDropBlock(worldIn, pos, state);
     }
     
     // TICKS/ EVENTS
@@ -247,10 +237,15 @@ public class BlockCustomPlant extends Block implements IPlantable {
     public boolean onBlockActivated(World worldIn, BlockPos pos, IBlockState state, EntityPlayer playerIn,
                                     EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
         if (worldIn.isRemote) return true;
-        boolean activatedOut = !this.isActivated(state);
-        this.behavior.onActivated(activatedOut, this.getAge(state), worldIn, pos, state, playerIn, hand, facing, hitX, hitY, hitZ);
-        worldIn.setBlockState(pos, this.setActivated(activatedOut, state));
+        this.toggleActivation(worldIn, pos, state);
+        float f = this.isActivated(state) ? 0.6F : 0.5F;
+        worldIn.playSound(null, pos, SoundEvents.BLOCK_LEVER_CLICK, SoundCategory.BLOCKS, 0.3F, f);
         return true;
+    }
+    
+    protected void toggleActivation(World worldIn, BlockPos pos, IBlockState state) {
+        state = this.setActivated(this.isActivated(state), state);
+        worldIn.setBlockState(pos, state, 3);
     }
     
     @Override
@@ -371,5 +366,27 @@ public class BlockCustomPlant extends Block implements IPlantable {
     
     protected IBlockState createDefaultBlockState(IBlockState stateIn) {
         return stateIn.withProperty(ACTIVATED, false);
+    }
+    
+    // UTIL
+    
+    protected BlockPos getBlockPosToSoil(IBlockState stateIn, BlockPos posIn) {
+        return this.getBlockPosToSoil(stateIn, posIn, 1);
+    }
+    
+    protected BlockPos getBlockPosToSoil(IBlockState stateIn, BlockPos posIn, int n) {
+        // when this plant's facing is UP (plant grows on the floor in direction sky),
+        // the soil is the block below, i.e. pos.down(). That's why I need the opposite facing.
+        return posIn.offset(this.getFacing(stateIn).getOpposite(), n);
+    }
+    
+    protected BlockPos getBlockPosToGrowing(IBlockState stateIn, BlockPos posIn) {
+        return this.getBlockPosToGrowing(stateIn, posIn, 1);
+    }
+    
+    protected BlockPos getBlockPosToGrowing(IBlockState stateIn, BlockPos posIn, int n) {
+        // when this plant's facing is UP (plant grows on the floor in direction sky),
+        // the block, this plant grows to is the block above, i.e. pos.up(). That's why I need the facing.
+        return posIn.offset(this.getFacing(stateIn), n);
     }
 }

@@ -5,7 +5,6 @@ import com.luka5w.customplants.common.plantsbehavior.PlantBehavior;
 import net.minecraft.block.Block;
 import net.minecraft.block.IGrowable;
 import net.minecraft.block.material.Material;
-import net.minecraft.block.properties.PropertyBool;
 import net.minecraft.block.properties.PropertyInteger;
 import net.minecraft.block.state.BlockFaceShape;
 import net.minecraft.block.state.BlockStateContainer;
@@ -29,24 +28,30 @@ import java.util.List;
 import java.util.Random;
 
 public class BlockCustomCrops extends BlockCustomPlant implements IGrowable {
-    
-    public static final PropertyBool ACTIVATED = PropertyBool.create("activated");
     private static final int MAX_AGE = 7;
     public static final PropertyInteger AGE = PropertyInteger.create("age", 0, MAX_AGE);
     private final boolean canUseBonemeal;
     private final ItemCustomSeeds seeds;
+    private final int reqLightLvl;
     
     public BlockCustomCrops(AxisAlignedBB[] aabbs, PlantBehavior behavior, Material blockMaterial, BlockFaceShape blockShape,
-                            @Nullable List<Tuple<Float, ItemStack>> drops, EnumFacing facing, String oreDict,
-                            EnumPlantType type, boolean canUseBonemeal, ItemCustomSeeds seeds,
+                            @Nullable List<Tuple<Float, ItemStack>> drops, EnumFacing facing,
+                            EnumPlantType type, boolean canUseBonemeal, ItemCustomSeeds seeds, int reqLightLvl,
                             @Nullable ArrayList<String> soilsList, boolean soilsAllowed) {
         super(blockMaterial, aabbs, blockShape, behavior, drops, Collections.singletonList(facing),
               soilsList, soilsAllowed, type);
         this.canUseBonemeal = canUseBonemeal;
         this.seeds = seeds;
+        this.reqLightLvl = reqLightLvl;
+        this.setTickRandomly(true);
     }
     
     // PLACEMENT
+    
+    @Override
+    public boolean canPlaceBlockAt(World worldIn, BlockPos pos) {
+        return this.canPlaceBlockOnSide(worldIn, pos, this.facings.get(0));
+    }
     
     @Override
     public ItemStack getPickBlock(IBlockState state, RayTraceResult target, World world, BlockPos pos,
@@ -58,22 +63,23 @@ public class BlockCustomCrops extends BlockCustomPlant implements IGrowable {
     
     @Override
     public void updateTick(World worldIn, BlockPos pos, IBlockState state, Random rand) {
-        this.checkAndDropBlock(worldIn, pos, state);
-    
-        // TODO: 06.06.22 how does this method work?
-        //if (!worldIn.isAreaLoaded(pos, 1)) return; // Forge: prevent loading unloaded chunks when checking neighbor's light
-        //if (worldIn.getLightFromNeighbors(pos.up()) >= 9) {
-        int i = this.getAge(state);
-    
-        if (i < this.getMaxAge()) {
-            float f = getGrowthChance(this, worldIn, pos);
+        if (!worldIn.isRemote) {
+            this.checkAndDropBlock(worldIn, pos, state);
+            if (!worldIn.isAreaLoaded(pos, 1))
+                return; // Forge: prevent loading unloaded chunks when checking neighbor's light
+            if (worldIn.getLightFromNeighbors(pos.up()) >= this.reqLightLvl) {
+                int age = this.getAge(state);
         
-            if (ForgeHooks.onCropsGrowPre(worldIn, pos, state, rand.nextInt((int)(25.0F / f) + 1) == 0)) {
-                worldIn.setBlockState(pos, this.setAge(i + 1, state), 2);
-                ForgeHooks.onCropsGrowPost(worldIn, pos, state, worldIn.getBlockState(pos));
+                if (age < this.getMaxAge()) {
+                    float f = getGrowthChance(this, worldIn, pos);
+            
+                    if (ForgeHooks.onCropsGrowPre(worldIn, pos, state, rand.nextInt((int) (25.0F / f) + 1) == 0)) {
+                        worldIn.setBlockState(pos, this.setAge(age + 1, state), 2);
+                        ForgeHooks.onCropsGrowPost(worldIn, pos, state, worldIn.getBlockState(pos));
+                    }
+                }
             }
         }
-        //}
     }
     
     protected static float getGrowthChance(Block blockIn, World worldIn, BlockPos pos) {
@@ -159,18 +165,17 @@ public class BlockCustomCrops extends BlockCustomPlant implements IGrowable {
     
     @Override
     protected IBlockState setActivated(boolean activatedOut, IBlockState stateIn) {
-        return getDefaultState().withProperty(ACTIVATED, activatedOut)
-                                .withProperty(AGE, this.getAge(stateIn));
+        return super.setActivated(activatedOut, stateIn)
+                    .withProperty(AGE, this.getAge(stateIn));
     }
     
     @Override
-    protected boolean isActivated(IBlockState state) {
-        return state.getValue(ACTIVATED);
+    protected EnumFacing getFacing(IBlockState state) {
+        return this.facings.get(0);
     }
     
     protected IBlockState setAge(int age, IBlockState stateIn) {
-        return getDefaultState().withProperty(ACTIVATED, this.isActivated(stateIn))
-                                .withProperty(AGE, age);
+        return getDefaultState().withProperty(AGE, age);
     }
     
     protected int getAge(IBlockState state) {

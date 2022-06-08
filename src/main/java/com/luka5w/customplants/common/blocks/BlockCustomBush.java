@@ -2,7 +2,6 @@ package com.luka5w.customplants.common.blocks;
 
 import com.luka5w.customplants.common.plantsbehavior.PlantBehavior;
 import net.minecraft.block.material.Material;
-import net.minecraft.block.properties.PropertyBool;
 import net.minecraft.block.properties.PropertyEnum;
 import net.minecraft.block.state.BlockFaceShape;
 import net.minecraft.block.state.BlockStateContainer;
@@ -20,12 +19,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class BlockCustomBush extends BlockCustomPlant {
-    
-    public static final PropertyBool ACTIVATED = PropertyBool.create("activated");
     public static final PropertyEnum<EnumFacing> FACING = PropertyEnum.create("facing", EnumFacing.class);
     
     public BlockCustomBush(AxisAlignedBB[] aabbs, PlantBehavior behavior, Material blockMaterial, BlockFaceShape blockShape,
-                           @Nullable List<Tuple<Float, ItemStack>> drops, List<EnumFacing> facings, String oreDict, EnumPlantType type,
+                           @Nullable List<Tuple<Float, ItemStack>> drops, List<EnumFacing> facings, EnumPlantType type,
                            @Nullable ArrayList<String> soilsList, boolean soilsAllowed) {
         super(blockMaterial, aabbs, blockShape, behavior, drops, facings, soilsList, soilsAllowed, type);
     }
@@ -36,7 +33,7 @@ public class BlockCustomBush extends BlockCustomPlant {
     public boolean canPlaceBlockOnSide(World worldIn, BlockPos pos, EnumFacing side) {
         return this.facings.contains(side) &&
                this.canBlockStay(worldIn, pos, this.getDefaultState().withProperty(FACING, side)) &&
-               (this.soilsList != null || super.canPlaceBlockAt(worldIn, pos));
+               (this.soilsList != null || worldIn.getBlockState(pos).getBlock().isReplaceable(worldIn, pos));
     }
     
     @Override
@@ -47,8 +44,7 @@ public class BlockCustomBush extends BlockCustomPlant {
     @Override
     public IBlockState getStateForPlacement(World world, BlockPos pos, EnumFacing facing, float hitX, float hitY,
                                             float hitZ, int meta, EntityLivingBase placer, EnumHand hand) {
-        return this.getDefaultState().withProperty(ACTIVATED, false)
-                   .withProperty(FACING, facing);
+        return this.getDefaultState().withProperty(FACING, facing);
     }
     
     @Override
@@ -73,13 +69,8 @@ public class BlockCustomBush extends BlockCustomPlant {
                     .withProperty(FACING, this.getFacing(stateIn));
     }
     
-    @Override
-    protected boolean isActivated(IBlockState state) {
-        return state.getValue(ACTIVATED);
-    }
-    
     protected IBlockState setFacing(IBlockState stateIn) {
-        return super.setActivated(stateIn.getValue(ACTIVATED), stateIn)
+        return super.setActivated(this.isActivated(stateIn), stateIn)
                     .withProperty(FACING, this.getFacing(stateIn));
     }
     

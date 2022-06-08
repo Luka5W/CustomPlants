@@ -14,6 +14,7 @@ import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.registry.GameRegistry;
+import net.minecraftforge.oredict.OreDictionary;
 import net.minecraftforge.registries.IForgeRegistry;
 import org.apache.logging.log4j.Logger;
 
@@ -31,6 +32,8 @@ public class Registry {
     private final ArrayList<Block> blocks;
     private final ArrayList<ItemBlock> itemBlocks;
     private final ArrayList<Item> items;
+    private final ArrayList<Tuple<String, Item>> oresI;
+    private final ArrayList<Tuple<String, Block>> oresB;
     private final ArrayList<CreativeTabs> tabs;
     
     public static Registry getInstance() {
@@ -44,6 +47,8 @@ public class Registry {
         this.blocks = new ArrayList<>();
         this.itemBlocks = new ArrayList<>();
         this.items = new ArrayList<>();
+        this.oresI = new ArrayList<>();
+        this.oresB = new ArrayList<>();
         this.tabs = new ArrayList<>();
     
         // TODO: 01.05.22 is generation prevented?
@@ -120,6 +125,16 @@ public class Registry {
         return this.items;
     }
     
+    public Registry addOre(String name, Item ore) {
+        this.oresI.add(new Tuple(name, ore));
+        return this;
+    }
+    
+    public Registry addOre(String name, Block ore) {
+        this.oresB.add(new Tuple(name, ore));
+        return this;
+    }
+    
     public Registry addTab(CreativeTabs tab) {
         this.tabs.add(tab);
         return this;
@@ -185,5 +200,13 @@ public class Registry {
             getInstance().logger.debug("Registering ItemBlock '{}'", itemBlock.getRegistryName());
             registry.register(itemBlock);
         }
+    }
+    
+    @SubscribeEvent
+    public static void registerOres(OreDictionary.OreRegisterEvent event) {
+        for (Tuple<String, Item> ore : getInstance().oresI)
+            OreDictionary.registerOre(ore.getFirst(), ore.getSecond());
+        for (Tuple<String, Block> ore : getInstance().oresB)
+            OreDictionary.registerOre(ore.getFirst(), ore.getSecond());
     }
 }

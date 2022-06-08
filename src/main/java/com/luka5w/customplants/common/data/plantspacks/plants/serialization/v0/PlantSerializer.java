@@ -27,11 +27,9 @@ import java.util.List;
  */
 public class PlantSerializer implements IJsonSerializer<Plant> {
     
-    private final boolean canGrow;
     private final int maxDrops;
     
-    public PlantSerializer(boolean canGrow, int maxDrops) {
-        this.canGrow = canGrow;
+    public PlantSerializer(int maxDrops) {
         this.maxDrops = maxDrops;
     }
     
@@ -43,7 +41,7 @@ public class PlantSerializer implements IJsonSerializer<Plant> {
         String path = JsonUtil.getPath(path_, key);
         JsonObject plantJson = JsonUtil.getAsT(json, path, JsonElement::getAsJsonObject, "object");
         ArrayList<AxisAlignedBB> aabbs;
-        if (this.canGrow || !plantJson.has("bounding_box")) {
+        if (plantJson.has("bounding_boxes")) {
             String aabbPath = JsonUtil.getPath(path, "bounding_boxes");
             aabbs = JsonUtil.getAsArrayOfT(JsonUtil.getChild(plantJson, "bounding_boxes"), aabbPath,
                                            (aabb, aabbPath1, aabbI) -> new AABBSerializer(
@@ -85,7 +83,7 @@ public class PlantSerializer implements IJsonSerializer<Plant> {
             return new Tuple<>(rounds, new ItemStack(Item.getByNameOrId(item[0]), count, meta));
                                                                  }, "object");
         List<EnumFacing> facings;
-        if (!this.canGrow  || plantJson.has("facings")) {
+        if (plantJson.has("facings")) {
             facings = JsonUtil.getAsArrayOfT(JsonUtil.getChild(plantJson, "facings"), JsonUtil.getPath(path, "facings"),
                                              (facingJson, facingsPath, i) -> EnumFacing.values()[JsonUtil.getAsNumber(
                                                      facingJson, JsonUtil.getPath(facingsPath, i), 0, 5, 1)],
@@ -98,8 +96,7 @@ public class PlantSerializer implements IJsonSerializer<Plant> {
                                                                  JsonUtil.getPath(path, "facing"), 0, 5, 1)]);
         }
         String oreDict = JsonUtil.getChildAsT(plantJson, path, "ore_dict", JsonElement::getAsString, "string");
-        int typeI = JsonUtil.getAsNumber(JsonUtil.getChild(plantJson, "type"), JsonUtil.getPath(path, "type"), -1, 6, EnumPlantType.Plains.ordinal());
-        EnumPlantType type = typeI == -1 ? EnumPlantType.Plains : EnumPlantType.values()[typeI];
+        EnumPlantType type = EnumPlantType.values()[JsonUtil.getAsNumber(JsonUtil.getChild(plantJson, "type"), JsonUtil.getPath(path, "type"), 0, EnumPlantType.values().length - 1, EnumPlantType.Plains.ordinal())];
         boolean soilsEnabled = JsonUtil.getChildAsT(plantJson, path, "soils_enabled", JsonElement::getAsBoolean, "boolean");
         ArrayList<String> soils = null;
         boolean soilsAllowed = false;

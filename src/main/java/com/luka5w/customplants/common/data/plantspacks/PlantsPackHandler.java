@@ -31,14 +31,14 @@ public class PlantsPackHandler {
             .setPrettyPrinting()
             .create();
     protected static final Pattern PATTERN_PLANT_FILE = Pattern.compile("^[a-z]([a-z\\d_]*[a-z\\d])?\\.json$");
+    protected static final Pattern PATTERN_TREE_FILE = Pattern.compile("^[a-z]([a-z\\d_]*[a-z\\d])?\\.tree.txt$");
     protected static final boolean ZIP_SEPARATOR_DIFFERENT = !"/".equals(File.separator);
     protected final Logger logger;
     protected final File packsDir;
     protected final HashMap<PlantsPackMeta, File> packs;
     private final Registry registry;
     private final int maxDrops;
-    //private ArrayList<PlantConfig> plantConfigs;
-    private ArrayList<Config> plantConfigs2;
+    private ArrayList<Config> plantConfigs;
     
     public PlantsPackHandler(Logger logger, File packsDir, Registry registry, int maxDrops) {
         this.logger = logger;
@@ -121,21 +121,32 @@ public class PlantsPackHandler {
             this.logger.warn("Empty plants pack detected: ID: {} File: {}", pack.getID(), packFile.getName());
             return;
         }
+        // treeConfigs[<int/version[0]>].<name>[<variant>]>
+        ArrayList<HashMap<String, String>> treeConfigs = new ArrayList<>();
+        if (packFileExists(packFile, "customplants/trees")) {
+            List<String> configPaths = readPackFilePaths(packFile, "customplants/trees", (filename) -> PATTERN_TREE_FILE.matcher(filename).matches());
+            treeConfigs.add(new HashMap<>());
+            if (configPaths != null) {
+                for (String configPath : configPaths) {
+                    String name = FilenameUtils.getBaseName(FilenameUtils.getBaseName(configPath));
+                    for (int i = 0; treeConfigs.get(0).containsKey(name); ++i) name += "_" + i;
+                    treeConfigs.get(0).put(name, readPackFile(packFile, configPath));
+                }
+            }
+        }
+        this.plantConfigs = new ArrayList<>();
+        this.loadPlantConfigs(packFile, "customplants/bushes", Config.class, new Serializer(this.logger, Type.EnumType.Bush, this.maxDrops));
+        this.loadPlantConfigs(packFile, "customplants/crops", Config.class, new Serializer(this.logger, Type.EnumType.Crops, this.maxDrops));
+        this.loadPlantConfigs(packFile, "customplants/extendables", Config.class, new Serializer(this.logger, Type.EnumType.Extendable, this.maxDrops));
+        this.loadPlantConfigs(packFile, "customplants/saplings", Config.class, new Serializer(this.logger, Type.EnumType.Sapling, this.maxDrops));
         
-        this.plantConfigs2 = new ArrayList<>();
-        this.loadPlantConfigs2(packFile, "customplants/bushes", Config.class, new Serializer(Type.EnumType.Bush, this.maxDrops));
-        this.loadPlantConfigs2(packFile, "customplants/crops", Config.class, new Serializer(Type.EnumType.Crops, this.maxDrops));
-        this.loadPlantConfigs2(packFile, "customplants/overlays", Config.class, new Serializer(Type.EnumType.Overlay, this.maxDrops));
-        this.loadPlantConfigs2(packFile, "customplants/extendables", Config.class, new Serializer(Type.EnumType.Extendable, this.maxDrops));
-        this.loadPlantConfigs2(packFile, "customplants/saplings", Config.class, new Serializer(Type.EnumType.Sapling, this.maxDrops));
-        
-        for (Config config : this.plantConfigs2) {
-            config.addRegistryEntries(this.registry);
+        for (Config config : this.plantConfigs) {
+            config.addRegistryEntries(this.registry, treeConfigs);
         }
     }
     
     /**
-     * Loads all configs of a type. Requires {@link #plantConfigs2} to be initialized!
+     * Loads all configs of a type. Requires {@link #plantConfigs} to be initialized!
      * <p>
      *     For {@param type} and {@param typeAdapter}, see descriptions in
      *     {@link GsonBuilder#registerTypeAdapter(java.lang.reflect.Type, Object)}and {@link Gson#fromJson(String, Class)}.
@@ -146,7 +157,7 @@ public class PlantsPackHandler {
      * @param typeAdapter The (de)serialization class for the config holder class.
      * @throws IOException When an I/O Error occurs in {@link #packFileExists(File, String)}, {@link #readPackFilePaths(File, String, FileNameFilter)} or {@link #readPackFile(File, String)}.
      */
-    protected void loadPlantConfigs2(File packFile, String path, Class<? extends Config> type, Object typeAdapter) throws IOException {
+    protected void loadPlantConfigs(File packFile, String path, Class<? extends Config> type, Object typeAdapter) throws IOException {
         if (packFileExists(packFile, path)) {
             List<String> configPaths = readPackFilePaths(packFile, path, (filename) -> PATTERN_PLANT_FILE.matcher(filename).matches());
             if (configPaths != null) {
@@ -155,8 +166,8 @@ public class PlantsPackHandler {
                         .setPrettyPrinting()
                         .create();
                 for (String configPath : configPaths)
-                    this.plantConfigs2.add(gson.fromJson(readPackFile(packFile, configPath), type)
-                                               .finalize(FilenameUtils.getBaseName(configPath)));
+                    this.plantConfigs.add(gson.fromJson(readPackFile(packFile, configPath), type)
+                                              .finalize(FilenameUtils.getBaseName(configPath)));
             }
         }
     }
